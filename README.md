@@ -1,4 +1,3 @@
-```markdown
 # ⚡ PowerPulse — Household Energy Usage Forecast
 
 PowerPulse is an end‑to‑end machine learning project that predicts **next‑hour household electricity consumption** using the **Individual Household Electric Power Consumption** dataset from the UCI Machine Learning Repository.
@@ -232,7 +231,6 @@ These plots support both **technical evaluation** and **storytelling**.
 PowerPulse-Energy-Forecast/
 ├── app.py
 ├── requirements.txt
-├── README.md
 │
 ├── data/
 │   └── processed/
@@ -252,13 +250,14 @@ PowerPulse-Energy-Forecast/
 │   └── 03_modeling_evaluation.ipynb
 │
 └── outputs/
-    ├── models/
-    │   ├── best_model.pkl
-    │   └── results_summary.pkl
-    └── plots/
-        ├── feature_importance.png
-        ├── model_predictions.png
-        └── residuals_analysis.png
+│    ├── models/
+│    │   ├── best_model.pkl
+│    │   └── results_summary.pkl
+│    └── plots/
+│       ├── feature_importance.png
+│        ├── model_predictions.png
+│        └── residuals_analysis.png
+└── README.md
 ```
 
 ---
@@ -375,10 +374,7 @@ It combines solid modeling results (**R² ≈ 0.976**) with an interactive app, 
 
 ## 👤 Author
 
-**David John Raj D**  
-Business Process Lead – Operations, TCS  
+**David Raj**  
+Data Analyst - TCS  
 
 **Skills:** Python, SQL, Machine Learning, Data Analysis, Power BI
-```
-
-You can paste this directly into your `README.md`.
