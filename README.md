@@ -1,3 +1,4 @@
+```markdown
 # ⚡ PowerPulse — Household Energy Usage Forecast
 
 PowerPulse is an end‑to‑end machine learning project that predicts **next‑hour household electricity consumption** using the **Individual Household Electric Power Consumption** dataset from the UCI Machine Learning Repository.
@@ -11,8 +12,6 @@ The project demonstrates a complete data science workflow:
 - Evaluation with robust metrics
 - Deployment via a **Streamlit** prediction app
 
-The README is result‑oriented and aligned with GUVI’s evaluation criteria.
-
 ---
 
 ## 🎯 Objective
@@ -21,10 +20,10 @@ Build a regression model to predict **next‑hour Global Active Power (kW)** bas
 
 This enables:
 
-- Smarter household energy management
-- Anticipation of peak demand
-- Potential reduction in electricity costs
-- A baseline for smarter grid and automation use‑cases
+- Smarter household energy management  
+- Anticipation of peak demand  
+- Potential reduction in electricity costs  
+- A baseline for smarter grid and automation use‑cases  
 
 ---
 
@@ -55,35 +54,35 @@ The target used for modeling is a **log‑transformed** version of global active
 
 ## 🔎 EDA Summary (High‑Level)
 
-Using a structured EDA approach (15‑question guide in the project brief), the notebooks explore:
+Using a structured EDA approach (15‑question guide from the project brief), the notebooks explore:
 
-- **Data quality & missing values** – inspecting gaps and invalid readings.
-- **Distributions** – consumption is skewed with occasional high‑load spikes.
-- **Correlations** – clear relationships between global power and sub‑meter signals.
-- **Temporal behavior** – visible daily and weekly patterns in energy use.
-- **Outliers** – extreme cases are inspected and treated so they don’t dominate training.
+- **Data quality & missing values** – inspecting gaps and invalid readings.  
+- **Distributions** – consumption is right‑skewed with occasional high‑load spikes.  
+- **Correlations** – clear relationships between global power and sub‑meter signals.  
+- **Temporal behavior** – visible daily and weekly patterns in energy use.  
+- **Outliers** – extreme cases are inspected and treated so they don’t dominate training.  
 
-The EDA establishes that **recent usage and specific appliances** are strongly linked to short‑term demand.
+Overall, the EDA shows that **recent usage and specific high‑load appliances** are strongly linked to short‑term demand.
 
 ---
 
 ## ⚙️ Data Preprocessing & Feature Engineering
 
 All preprocessing logic is implemented in  
-`02_preprocessing_feature_engineering.ipynb`.
+`notebooks/02_preprocessing_feature_engineering.ipynb`.
 
 ### 1️⃣ Cleaning & Resampling
 
-- Time‑sorted the data.
-- Handled missing/invalid values with appropriate imputation/cleaning.
-- Aggregated 1‑minute readings to **hourly** level for modeling.
+- Time‑sorted the data.  
+- Handled missing/invalid values with appropriate imputation/cleaning.  
+- Aggregated 1‑minute readings to **hourly** level for modeling.  
 
 ### 2️⃣ Time‑Based Features
 
 From the timestamp, the following were derived:
 
-- `dayofweek` (0–6)
-- `isweekend` (0/1)
+- `dayofweek` (0–6)  
+- `isweekend` (0/1)  
 - `hour` (0–23), then encoded as:
   - `hoursin = sin(2π·hour / 24)`
   - `hourcos = cos(2π·hour / 24)`
@@ -94,8 +93,8 @@ These capture **daily and weekly seasonality**.
 
 To incorporate temporal dependence in the model:
 
-- `lag1h` – global active power (log scale) from the previous hour.
-- `roll24h` – 24‑hour rolling mean of global active power (log scale).
+- `lag1h` – global active power (log scale) from the previous hour.  
+- `roll24h` – 24‑hour rolling mean of global active power (log scale).  
 
 These features let the model learn from **recent trends and daily patterns**.
 
@@ -103,15 +102,17 @@ These features let the model learn from **recent trends and daily patterns**.
 
 The column `Global_intensity` is physically derived from the same quantities as the target and introduces **data leakage** if used.
 
-- In `03_modeling_evaluation.ipynb`, `Global_intensity` is explicitly removed from the feature matrix and from the saved feature list.
+- It is explicitly removed from the feature matrix and from the saved feature list.
 - The final model and the Streamlit app **do not use** `Global_intensity` at inference time.
 
 ### 5️⃣ Scaling & Artifacts
 
 - Input features are standardized using `StandardScaler` (fitted on training data).
-- Saved artifacts:
-  - `data/processed/scaler.pkl` – fitted scaler
-  - `data/processed/features.pkl` – list of **final 10 features**
+- Saved artifacts in `data/processed/`:
+  - `scaler.pkl` – fitted scaler
+  - `features.pkl` – list of **final 10 features**
+  - `X_train.npy.7z`, `X_test.npy.7z`, `df_cleaned.csv.7z` – compressed arrays/CSV for GitHub
+  - `y_train.npy`, `y_test.npy` – target arrays
 
 **Final feature set used by the champion model:**
 
@@ -133,7 +134,7 @@ The column `Global_intensity` is physically derived from the same quantities as 
 ## 🤖 Modeling & Results
 
 Modeling and evaluation are implemented in  
-`03_modeling_evaluation.ipynb`.
+`notebooks/03_modeling_evaluation.ipynb`.
 
 ### Models Trained
 
@@ -145,8 +146,8 @@ Modeling and evaluation are implemented in
 
 ### Time‑Series Aware Validation
 
-- Train/test split respects **time order** (no shuffling).
-- Internal cross‑validation uses **TimeSeriesSplit** to avoid future data leaking into training.
+- Train/test split respects **time order** (no shuffling).  
+- Internal cross‑validation uses **TimeSeriesSplit** to avoid future data leaking into training.  
 
 ### Performance Summary (Log‑Transformed Target)
 
@@ -158,18 +159,19 @@ On the large held‑out test set:
 | Random Forest     | 0.9759 | 0.0590     | 0.0243    |
 | **XGBoost**       | **0.9760** | **0.0589** | **0.0252** |
 
-- RMSE / MAE above are in **log‑kW space**.
-- When converted back to kW, the XGBoost model’s errors are on the order of **a few tenths of a kW** (approximate, as noted in notebooks).
+- RMSE / MAE above are in **log‑kW space**.  
+- When converted back to kW, the XGBoost model’s errors are on the order of **a few tenths of a kW** (approximate).
 
-**Champion model:** XGBoost Regressor saved as `bestmodel.pkl`.
+**Champion model:** XGBoost Regressor saved as:
 
-Saved evaluation artifacts include:
+- `outputs/models/best_model.pkl`  
 
-- `outputs/models/bestmodel.pkl`
-- `outputs/models/results_summary.pkl`
-- `outputs/plots/modelpredictions.png`
-- `outputs/plots/featureimportance.png`
-- `outputs/plots/residualsanalysis.png`
+Additional evaluation artifacts:
+
+- `outputs/models/results_summary.pkl`  
+- `outputs/plots/model_predictions.png`  
+- `outputs/plots/feature_importance.png`  
+- `outputs/plots/residuals_analysis.png`  
 
 ---
 
@@ -179,11 +181,11 @@ From the XGBoost feature importance analysis:
 
 **Most influential features:**
 
-1. **`lag1h`** – Previous hour’s consumption (log).
-2. **`roll24h`** – 24‑hour rolling average (log).
-3. **`Submetering3`** – Heavy loads like water heater / HVAC.
-4. **`Voltage`** – Reflects loading conditions on the grid.
-5. Time features: `hoursin`, `hourcos`, `dayofweek`, `isweekend`.
+1. **`lag1h`** – Previous hour’s consumption (log).  
+2. **`roll24h`** – 24‑hour rolling average (log).  
+3. **`Submetering3`** – Heavy loads like water heater / HVAC.  
+4. **`Voltage`** – Reflects loading conditions on the grid.  
+5. Time features: `hoursin`, `hourcos`, `dayofweek`, `isweekend`.  
 
 **Takeaway:**  
 Short‑term electricity demand is strongly driven by **recent usage patterns** plus specific high‑consumption appliances, with clear daily/weekly structure.
@@ -214,32 +216,35 @@ From the modeling and feature analysis:
 
 Key visual outputs (in `outputs/plots/`):
 
-- **Model predictions vs actual** (`modelpredictions.png`)
-- **Residual analysis** (`residualsanalysis.png`)
-  - Distribution of errors
-  - Residuals vs predictions
-- **Feature importance** (`featureimportance.png`)
+- **Model predictions vs actual** – `model_predictions.png`  
+- **Residual analysis** – `residuals_analysis.png`  
+  - Distribution of errors  
+  - Residuals vs predictions  
+- **Feature importance** – `feature_importance.png`  
 
-These plots support both **technical evaluation** and **storytelling** for reviews.
+These plots support both **technical evaluation** and **storytelling**.
 
 ---
 
-## 🏗 Project Structure
+## 🏗 Final Project Structure
 
 ```text
 PowerPulse-Energy-Forecast/
-├── app.py                          # Streamlit prediction app
-├── requirements.txt                # Python dependencies
-├── README.md                       # Project documentation
+├── app.py
+├── requirements.txt
+├── README.md
 │
 ├── data/
 │   └── processed/
-│       ├── X_train.npy
-│       ├── X_test.npy
-│       ├── y_train.npy
+│       ├── X_test.npy.7z
+│       ├── X_train.npy.7z
+│       ├── df_cleaned.csv.7z
+│       ├── features.pkl
+│       ├── scaler.pkl
 │       ├── y_test.npy
-│       ├── scaler.pkl             # StandardScaler object
-│       └── features.pkl           # Final 10 feature names
+│       ├── y_train.npy
+│       └── raw/
+│           └── household_power_consumption... (original / compressed file)
 │
 ├── notebooks/
 │   ├── 01_data_understanding.ipynb
@@ -248,12 +253,12 @@ PowerPulse-Energy-Forecast/
 │
 └── outputs/
     ├── models/
-    │   ├── bestmodel.pkl          # Champion XGBoost model
-    │   └── results_summary.pkl    # All model metrics
+    │   ├── best_model.pkl
+    │   └── results_summary.pkl
     └── plots/
-        ├── modelpredictions.png
-        ├── residualsanalysis.png
-        └── featureimportance.png
+        ├── feature_importance.png
+        ├── model_predictions.png
+        └── residuals_analysis.png
 ```
 
 ---
@@ -267,7 +272,7 @@ The Streamlit app (`app.py`) provides an interactive interface for live predicti
 1. **Load artifacts (cached):**
    ```python
    model, scaler, feature_names = load_model()
-   # bestmodel.pkl, scaler.pkl, features.pkl
+   # best_model.pkl, scaler.pkl, features.pkl
    ```
 
 2. **Collect user inputs via sliders:**
@@ -299,9 +304,9 @@ The Streamlit app (`app.py`) provides an interactive interface for live predicti
    ```
 
 5. **Display:**
-   - Predicted next‑hour power (kW).
-   - Reference to model accuracy (R² ≈ 0.976).
-   - Optional: model comparison table and feature importance image.
+   - Predicted next‑hour power (kW).  
+   - Reference to model accuracy (R² ≈ 0.976).  
+   - Optional: model comparison table and feature importance image.  
 
 ---
 
@@ -342,8 +347,9 @@ You should have (either from the repo or by re‑running notebooks):
 
 - `data/processed/scaler.pkl`
 - `data/processed/features.pkl`
-- `outputs/models/bestmodel.pkl`
-- `outputs/plots/featureimportance.png` (and other plots)
+- `outputs/models/best_model.pkl`
+- `outputs/plots/feature_importance.png` (and other plots)
+- Optionally the compressed arrays: `X_train.npy.7z`, `X_test.npy.7z`, `df_cleaned.csv.7z`
 
 4️⃣ **Run the Streamlit app**
 ```bash
@@ -358,20 +364,21 @@ Then open the URL shown in your terminal (usually `http://localhost:8501`).
 
 This project demonstrates how ML can be applied in the **Energy & Utilities** domain to:
 
-- Forecast short‑term household electricity demand
-- Identify and quantify peak periods
-- Reveal which appliances and behaviors drive usage
-- Provide a baseline for smart‑grid, dynamic pricing, and home automation solutions
+- Forecast short‑term household electricity demand  
+- Identify and quantify peak periods  
+- Reveal which appliances and behaviors drive usage  
+- Provide a baseline for smart‑grid, dynamic pricing, and home automation solutions  
 
-It combines solid modeling results (R² ≈ 0.976) with an interactive app, making it suitable for both technical evaluation and real‑world demonstration.
+It combines solid modeling results (**R² ≈ 0.976**) with an interactive app, making it suitable for both technical evaluation and real‑world demonstration.
 
 ---
 
 ## 👤 Author
 
-**David Raj**  
-Data Analyst - TCS  
+**David John Raj D**  
+Business Process Lead – Operations, TCS  
 
 **Skills:** Python, SQL, Machine Learning, Data Analysis, Power BI
+```
 
----
+You can paste this directly into your `README.md`.
